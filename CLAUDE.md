@@ -149,6 +149,22 @@ Le projet utilise maintenant `windows-toasts` qui offre :
 - **Integration Action Center** Windows
 - **Durée d'affichage** configurable
 
-### 🚀 Prochaines Étapes
+### ✅ Projet Terminé et Fonctionnel
 
-Pour continuer le développement, il faut maintenant implémenter les composants logiques du serveur :
+Le projet Toasty est maintenant **100% fonctionnel** ! Tous les composants ont été implémentés et testés avec succès.
+
+### 📚 Documentation Utilisateur
+
+- **[README.md](README.md)** - Vue d'ensemble et démarrage rapide
+- **[USAGE_GUIDE.md](USAGE_GUIDE.md)** - Guide complet d'utilisation avec exemples
+- **Repository GitHub** - [https://github.com/amsolg/toasty](https://github.com/amsolg/toasty)
+
+### 🎯 Utilisation
+
+Pour utiliser Toasty dans vos projets :
+
+1. **Démarrer le serveur** : `python run_server.py`
+2. **Connecter votre application** à `localhost:50053` via gRPC
+3. **Consulter** [USAGE_GUIDE.md](USAGE_GUIDE.md) pour des exemples détaillés
+
+Le service est maintenant prêt pour l'intégration dans votre écosystème d'agents !
