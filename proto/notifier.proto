@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+// Le package 'toasty' est utilisé pour ce service
+package toasty;
+
+// Le service de notification
+service Notifier {
+  // Envoie une notification. C'est un appel "fire-and-forget".
+  // Le client n'attend pas que l'utilisateur ferme la notification,
+  // il attend juste la confirmation que la requête a été reçue et traitée.
+  rpc SendNotification (NotificationRequest) returns (NotificationResponse);
+}
+
+// La requête de notification
+message NotificationRequest {
+  string title = 1;     // Titre de la notification (ex: "Nouveau courriel")
+  string message = 2;   // Corps du message (ex: "Sujet: Rapport...")
+
+  // Niveau de la notification pour l'icône, etc. (optionnel mais bon à avoir)
+  enum Level {
+    INFO = 0;
+    WARNING = 1;
+    ERROR = 2;
+  }
+  Level level = 3;
+}
+
+// Une réponse simple pour confirmer la réception
+message NotificationResponse {
+  bool success = 1;         // Vrai si la notification a été envoyée, faux sinon
+  string error_message = 2; // Message d'erreur si success=false
+}
