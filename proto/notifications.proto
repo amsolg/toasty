@@ -1,0 +1,146 @@
+syntax = "proto3";
+
+package sam.notifications.v1;
+
+// Le service principal pour la publication et l'abonnement aux notifications.
+service NotificationService {
+  // RPC unaire pour qu'un producteur publie une notification.
+  // La requête contient des métadonnées de ciblage et la notification elle-même.
+  rpc Publish(PublishRequest) returns (PublishResponse);
+
+  // RPC de streaming côté serveur pour qu'un agent client s'abonne
+  // à son flux de notifications personnel.
+  rpc Subscribe(SubscriptionRequest) returns (stream Notification);
+}
+
+// ===================================================================
+// Messages pour les RPC
+// ===================================================================
+
+message PublishRequest {
+  // L'ID du client ou du groupe cible.
+  string target_client_id = 1;
+  // Le message de notification à envoyer.
+  Notification notification = 2;
+}
+
+message PublishResponse {
+  // Un ID de suivi pour la notification publiée.
+  string notification_id = 1;
+  // Indique si la publication a été acceptée par le serveur.
+  bool success = 2;
+}
+
+message SubscriptionRequest {
+  // L'ID unique de l'agent qui s'abonne.
+  string client_id = 1;
+}
+
+// ===================================================================
+// Structure principale de la notification et ses composants
+// ===================================================================
+
+// Le message de notification de haut niveau.
+// Utilise 'oneof' pour garantir un seul type de charge utile par notification.
+message Notification {
+  // Un identifiant unique pour cette instance de notification.
+  string id = 1;
+  // Le niveau d'urgence sémantique.
+  UrgencyLevel urgency = 2;
+  // Indice pour le son à jouer.
+  AudioHint audio_hint = 3;
+  // L'horodatage de la création de la notification.
+  int64 timestamp_ms = 4;
+
+  // La charge utile réelle de la notification, définie comme un type polymorphe.
+  oneof payload {
+    TextMessage text_message = 5;
+    ImageTextMessage image_text_message = 6;
+    InteractiveMessage interactive_message = 7;
+    ProgressMessage progress_message = 8;
+  }
+}
+
+enum UrgencyLevel {
+  URGENCY_LEVEL_UNSPECIFIED = 0;
+  INFO = 1;
+  WARNING = 2;
+  CRITICAL = 3;
+}
+
+enum AudioHint {
+  AUDIO_HINT_UNSPECIFIED = 0;
+  DEFAULT = 1;
+  ALARM = 2;
+  REMINDER = 3;
+  SILENT = 4;
+}
+
+// ===================================================================
+// Définitions des charges utiles (payloads)
+// ===================================================================
+
+message TextMessage {
+  Header header = 1;
+  string body_text_line1 = 2;
+  string body_text_line2 = 3;
+}
+
+message ImageTextMessage {
+  Header header = 1;
+  string body_text = 2;
+  Image image = 3;
+}
+
+message InteractiveMessage {
+  Header header = 1;
+  string body_text = 2;
+  repeated Button buttons = 3;
+  optional TextInput text_input = 4;
+}
+
+message ProgressMessage {
+  Header header = 1;
+  ProgressBar progress_bar = 2;
+}
+
+
+// ===================================================================
+// Définitions des composants réutilisables
+// ===================================================================
+
+message Header {
+  string title = 1;
+  optional string subtitle = 2;
+}
+
+message Image {
+  // Chemin d'accès local vers le fichier image.
+  string local_path = 1;
+  enum Placement {
+    PLACEMENT_UNSPECIFIED = 0;
+    // Remplace le logo de l'application.
+    APP_LOGO_OVERRIDE = 1;
+    // Affiche une grande image "héroïque".
+    HERO = 2;
+  }
+  Placement placement = 2;
+}
+
+message Button {
+  string text = 1;
+  // ID unique pour cette action, renvoyé dans le callback.
+  string action_id = 2;
+}
+
+message TextInput {
+  string id = 1;
+  string placeholder_text = 2;
+}
+
+message ProgressBar {
+  string status_text = 1;
+  // Valeur entre 0.0 et 1.0.
+  float value = 2;
+  optional string value_string_override = 3;
+}
